@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/iconfont.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" href="./js/bootstrap/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -28,43 +29,74 @@
                 <input type="submit" class="input_sub" id="btn_login" value="登 录">
             </form>
         </div>
-    </div> 
+    </div>
+
+    <!-- 引入bootstrap中的模块化弹窗(优化alert弹出窗) -->
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">温馨提示:</h4>
+                </div>
+                <div class="modal-body">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 引入jq文件 -->
     <script src="./js/jquery-1.12.4.min.js"></script>
+    <script src="./js/bootstrap/js/bootstrap.min.js"></script>
     <script>
-    $(function(){
-        //1.给登录按钮一个点击事件,并阻止默认的跳转事件(因为他是form表单中的submit)
-        $('#btn_login').on('click',function(e){
-            e.preventDefault();
-            //2.获取用户名和密码,去掉前后的空格trim()
-            var userName = $('.input_txt').val().trim();
-            var password = $('.input_pass').val().trim();
-            //3.判断是否为空,为空的话不要继续
-            if(userName == ""||password == ""){
-                alert('用户名或密码为空');
-                return;
-            }//如果不为空,就继续操作
-            //4.发送ajax请求,判断账号密码输入的是否正确
-            $.ajax({
-                type:'post',
-                url:'http://localhost:8000/admin/login',
-                data:{
-                    user_name:userName,
-                    password:password
-                },
-                success:function(data){
-                    console.log(data);
-                    //如果正确,跳转到首页
-                    if(data.code == 200){
-                        window.location.href = './index.html';
-                    }else{
-                        alert('账号或者密码错误!')
-                    }
+        $(function () {
+            //1.给登录按钮一个点击事件,并阻止默认的跳转事件(因为他是form表单中的submit)
+            $('#btn_login').on('click', function (e) {
+                e.preventDefault();
+                //2.获取用户名和密码,去掉前后的空格trim()
+                var userName = $('.input_txt').val().trim();
+                var password = $('.input_pass').val().trim();
+                //3.判断是否为空,为空的话不要继续
+                if (userName == "" || password == "") {
+                    $('.modal-body').text('用户名或密码为空!')
+                    $('#myModal').modal({
+                        keyboard: true
+                    })
+                    //alert('用户名或密码为空');
+                    return;
                 }
+                //如果不为空,就继续操作
+                //4.发送ajax请求,判断账号密码输入的是否正确
+                $.ajax({
+                    type: 'post',
+                    url: 'http://localhost:8000/admin/login',
+                    data: {
+                        user_name: userName,
+                        password: password
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        //如果正确,跳转到首页
+                        if (data.code == 200) {
+                            window.location.href = './index.html';
+                        } else {
+                            //alert('账号或者密码错误!')
+                            $('.modal-body').text('账号或者密码错误!!!')
+                            $('#myModal').modal({
+                                keyboard: true
+                            })
+                        }
+                    }
+                })
             })
         })
-    })
     </script>
 </body>
 
