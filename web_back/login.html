@@ -30,6 +30,42 @@
         </div>
     </div> 
 
+    <!-- 引入jq文件 -->
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script>
+    $(function(){
+        //1.给登录按钮一个点击事件,并阻止默认的跳转事件(因为他是form表单中的submit)
+        $('#btn_login').on('click',function(e){
+            e.preventDefault();
+            //2.获取用户名和密码,去掉前后的空格trim()
+            var userName = $('.input_txt').val().trim();
+            var password = $('.input_pass').val().trim();
+            //3.判断是否为空,为空的话不要继续
+            if(userName == ""||password == ""){
+                alert('用户名或密码为空');
+                return;
+            }//如果不为空,就继续操作
+            //4.发送ajax请求,判断账号密码输入的是否正确
+            $.ajax({
+                type:'post',
+                url:'http://localhost:8000/admin/login',
+                data:{
+                    user_name:userName,
+                    password:password
+                },
+                success:function(data){
+                    console.log(data);
+                    //如果正确,跳转到首页
+                    if(data.code == 200){
+                        window.location.href = './index.html';
+                    }else{
+                        alert('账号或者密码错误!')
+                    }
+                }
+            })
+        })
+    })
+    </script>
 </body>
 
 </html>
