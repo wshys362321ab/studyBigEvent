@@ -65,6 +65,53 @@
         </div>
     </div>
 
+    <script>
+    $(function(){
+        //1.调用获取用户详情信息接口
+        $.ajax({
+            type:'get',
+            url:'http://localhost:8000/admin/userinfo_get',
+            success:function(backData){
+                console.log(backData); 
+                //2.将获取的数据渲染到页面
+                for(const key in backData.data){
+                    $('input.' + key).val(backData.data[key]);
+                }
+                //头像
+                $('.user_pic').attr('src',backData.data.user_pic);
+            }
+        })
+
+        //给 '选取文件' 的按钮注册'选取文件'改变的事件change
+        $('#exampleInputFile').change(function(){
+            //拿到这个files元素  他是dom元素
+            var file = this.files[0];
+            //生成这个file文件的路径
+            var url = URL.createObjectURL(file);
+            //将url设置给img的src
+            $(this).prev().attr('src',url);
+        })
+
+        //点击修改按钮保存修改
+        $('.btn_success').on('click',function(e){
+            e.preventDefault();//阻止默认跳转
+            var formData = new FormData($('form')[0]);
+            $.ajax({
+                type:'post',
+                url:'http://localhost:8000/admin/userinfo_edit',
+                data:formData,
+                contentType:false,//formData形式的参数数据,不需要设置请求头
+                processData:false,//formData形式的参数数据,不要把formData数据转为键值对形式
+                success:function(data){
+                    console.log(data); 
+                    if(data.code == 200){
+                        window.location.href = './index.html';
+                    }   
+                }
+            })
+        })
+    })
+    </script>
 </body>
 
 </html>
