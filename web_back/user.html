@@ -5,12 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>文章列表</title>
+    <title>用户信息修改</title>
     <link rel="stylesheet" href="js/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/jquery-1.12.4.min.js"></script>
+    <script src="./js/bootstrap/js/bootstrap.min.js"></script>
 
 </head>
 
@@ -44,7 +45,11 @@
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
                         <img src="images/2.jpg" alt="" class="user_pic">
-                        <input type="file" id="exampleInputFile" name="user_pic">
+                        <input type="file" style="display:none" id="exampleInputFile" name="user_pic">
+                        <br>
+                        <label for="exampleInputFile">
+                            <img src="./images/uploadFileIcon.png" alt="">
+                        </label>
                     </div>
                 </div>
 
@@ -64,8 +69,27 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">温馨提示</h4>
+                </div>
+                <div class="modal-body">
+                    恭喜你修改成功!
+                </div>
+                <div class="modal-footer">
+                    <!--  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+                    <button type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
-        
+
         $(function () {
             //1.调用获取用户详情信息接口
             $.ajax({
@@ -94,7 +118,7 @@
 
             //点击修改按钮发送ajax  保存修改
             $('.btn-change').on('click', function (e) {
-                alert('哈哈哈哈')
+                // alert('哈哈哈哈')
                 e.preventDefault();//阻止默认跳转
                 var formData = new FormData($('form')[0]);
                 $.ajax({
@@ -106,8 +130,30 @@
                     success: function (data) {
                         console.log(data);
                         if (data.code == 200) {
-                            parent.window.location.reload();
+                            $('#myModal').modal()
+                            //parent.window.location.reload();
                         }
+
+                        //给模态框一个点击事件
+                        $('.btn-primary').on('click', function () {
+                            //点击模态框刷新父窗口
+                            // parent.window.location.reload();
+                            //再次获取用户信息,通过发送ajax请求获取
+                            $.ajax({
+                                type: 'get',
+                                url: 'http://localhost:8000/admin/getuser',
+                                success: function (backData) {
+                                    console.log(backData);
+                                    //渲染到页面
+                                    $('.user_info img').attr('src', backData.data.user_pic);
+                                    $('.user_info span').html('欢迎&nbsp;&nbsp; ' + backData.data.nickname);
+                                    //右上角的信息
+                                    $('.user_center_link img').attr('src', backData.data.user_pic);
+                                }
+                            })
+                            $('#myModal').modal('hide'); //隐藏模态框
+                        })
+                        
                     }
                 })
             })
