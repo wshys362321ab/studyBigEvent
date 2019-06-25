@@ -90,10 +90,8 @@
                 //将url设置给img的src
                 $(this).prev().attr('src', url);
             })
-
             //点击修改按钮发送ajax  保存修改
             $('.btn-change').on('click', function (e) {
-                alert('哈哈哈哈')
                 e.preventDefault();//阻止默认跳转
                 var formData = new FormData($('form')[0]);
                 $.ajax({
