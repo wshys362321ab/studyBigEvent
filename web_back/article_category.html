@@ -128,12 +128,12 @@
       backdrop: false
     });
 
-     $('#model_shutoff').click(function(){
-       //alert('shutoff');
-       $('#addModal').modal('hide');
-     });
+    $('#model_shutoff').click(function () {
+      //alert('shutoff');
+      $('#addModal').modal('hide');
+    });
 
-    $('#model_add').click(function(){
+    $('#model_add').click(function () {
       //alert('add');
       $('#addModal').modal('hide');
     });
@@ -149,7 +149,7 @@
     //封装获取文章类别的函数以备多次调用
     function getcataData() {
       $.ajax({
-        url: 'http://localhost:8000/admin/category_search ',
+        url: 'http://localhost:8000/admin/category_search',
         success: function (data) {
           //将获取到的文章分类信息通过模板引擎渲染到页面
           console.log(data);
@@ -189,30 +189,34 @@
     });
 
     //给删除按钮注册点击事件,使用委托的方式
-    $('tbody').on('click','.btn-delete',function(){
+    $('tbody').on('click', '.btn-delete', function () {
       console.log('1234567');
       var that = $(this);
       //给用户确认,是否要删除
-      if(confirm('你确定要删除么?')){
+      if (confirm('你确定要删除么?')) {
         //获取到id删除文章,有一个自定义属性data-id保存了id
         var id = $(this).attr('data-id');
         console.log(id);
         //获取到id之后发送ajax请求
         $.ajax({
-          url:'http://localhost:8000/admin/article_delete',
-          data:{
-            id:id
+          url: 'http://localhost:8000/admin/category_delete',
+          type:'post',
+          data: {
+            id: id
           },
-          success:function(data){
+          success: function (data) {
             console.log(data);
             //删除成功后重新渲染数据,数据已经确认删掉了,可以做一个障眼法,把"删除"这一行直接移除掉,页面不用重新渲染数据了
-            that.parent().parent().remove();
+            if (data.code == 200) {
+              that.parent().parent().remove();
+              //getcataData();
+            }
           }
         })
       }
     });
 
-    
+
   </script>
 
 </body>
