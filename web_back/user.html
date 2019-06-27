@@ -133,11 +133,8 @@
                             $('#myModal').modal()
                             //parent.window.location.reload();
                         }
-
                         //给模态框一个点击事件
                         $('.btn-primary').on('click', function () {
-                            //点击模态框刷新父窗口
-                            // parent.window.location.reload();
                             //再次获取用户信息,通过发送ajax请求获取
                             $.ajax({
                                 type: 'get',
@@ -145,15 +142,15 @@
                                 success: function (backData) {
                                     console.log(backData);
                                     //渲染到页面
-                                    $('.user_info img').attr('src', backData.data.user_pic);
-                                    $('.user_info span').html('欢迎&nbsp;&nbsp; ' + backData.data.nickname);
+                                   parent. $('.user_info img').attr('src', backData.data.user_pic);
+                                   parent.$('.user_info span').html('欢迎&nbsp;&nbsp; ' + backData.data.nickname);
                                     //右上角的信息
-                                    $('.user_center_link img').attr('src', backData.data.user_pic);
+                                    parent.$('.user_center_link img').attr('src', backData.data.user_pic);
                                 }
                             })
                             $('#myModal').modal('hide'); //隐藏模态框
                         })
-                        
+
                     }
                 })
             })
