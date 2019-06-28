@@ -33,6 +33,7 @@
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
+                        <img src="" alt="" style="height:100px;">
                         <input type="file" id="exampleInputFile">
                     </div>
                 </div>
@@ -80,6 +81,19 @@
         </div>
     </div>
 
+    <script>
+        //给上传图片文件按钮一个 change事件
+        $('#exampleInputFile').on('change', function () {
+            console.log('1122');
+            //获取到上传的第一个文件,DOM元素
+            var file = this.files[0];
+            ///生成文件的路径,并赋值给图片的src
+            var url = URL.createObjectURL(file);
+            $(this).prev().attr('src',url);
+        });
+
+        
+    </script>
 </body>
 
 </html>
