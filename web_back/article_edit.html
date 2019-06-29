@@ -5,16 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>文章列表</title>
+    <title>文章编辑</title>
     <link rel="stylesheet" href="js/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <link type="text/css" rel="stylesheet" href="js/jedate/css/jedate.css">
-    <script src="js/jquery-1.12.4.min.js"></script>
+   <!--  <script src="js/jquery-1.12.4.min.js"></script> -->
     <script src="js/jedate/js/jedate.js"></script>
     <script src="js/tinymce/js/tinymce/tinymce.min.js"></script>
     <script src="js/tinymce/js/tinymce_setup.js"></script>
+    <script src="./js/template-web.js"></script>
+    <script src="./js/jquery-1.12.4.min.js"></script>
 </head>
 
 <body>
@@ -27,20 +29,20 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="inputEmail3" value="文章标题文字">
+                        <input type="text" name="title" class="form-control my-title" id="inputEmail3" value="文章标题文字">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
                         <img src="images/pic06.jpg" class="article_cover">
-                        <input type="file" id="exampleInputFile">
+                        <input type="file" name="cover" id="exampleInputFile">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
+                        <select name="type" class="form-control my-cata">
                             <option>类别一</option>
                             <option>类别二</option>
                             <option>类别三</option>
@@ -54,7 +56,7 @@
                     <div class="col-sm-4">
 
                         <div class="input-group">
-                            <input type="text" class="form-control" value="2019-05-17" id="dateinput">
+                            <input type="text" name="date" class="form-control" value="2019-05-17" id="dateinput">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button"
                                     onclick="jeDate('#dateinput',{trigger:false,format: 'YYYY-MM-DD'})"><i
@@ -66,18 +68,88 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="rich_content" name="content" placeholder="文章内容" value="文章内容">
+                        <input type="text" class="form-control" id="rich_content" placeholder="文章内容" value="文章内容">
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">修改</button>
+                        <button type="submit" class="btn btn-success btn-edit">修改</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
+    <script id="tmp_cata" type="text/html">
+        {{each data}}
+        <option value = '{{$value.id}}'>{{$value.name}}</option>
+        {{/each}}
+    </script>
+    <script>
+        //进入编辑页,加载所有的文章类型
+        $.ajax({
+            url: 'http://localhost:8000/admin/category_search',
+            success: function (data) {
+                //将获取到的文章分类信息通过模板引擎渲染到页面
+                console.log(data);
+                //使用模板引擎核心方法渲染到页面
+                if (data.code == 200) {
+                    //调用模板引擎核心方法
+                    var res = template('tmp_cata', data);
+                    $('.my-cata').html(res);
+                }
+            }
+        });
+
+        //编辑第一步,给编辑按钮一个点击事件:在文章列表的编辑a标签href属性已经指向了编辑页
+        //将当前的要编辑的文章的id通过 url的拼接带 过去编辑页
+        //在编辑页拿到当前要删除的这一篇文章的 id
+        var id = window.location.search.split('=')[1];
+        console.log(id);
+
+        //发送ajax请求,把当前编辑的这片文章的数据放在编辑页相应的标签中
+        $.ajax({
+            url: 'http://localhost:8000/admin/search',
+            data: {
+                id: id
+            },
+            success: function (data) {
+                console.log(data);
+                if (data.code == 200) {
+                    //把当前编辑的这片文章的数据放在编辑页相应的标签中
+                    $('.my-title').val(data.data.title);//标题
+                    $('.article_cover').attr('src', data.data.cover);//封面
+                    $('my-cata').val(data.data.type);//数据类型
+                    $('#dateinput').val(data.data.date);//日期
+                    $('#rich_content').val(data.data.content);//内容
+                }
+            }
+        });
+
+
+        //编辑第二步,给修改按钮一个点击事件
+        $('.btn-edit').on('click', function (e) {
+            console.log('1234567');
+            e.preventDefault();
+            var formdata = new FormData($('form')[0]);
+            //把需要编辑的文章  的 id和 富文本的内容获取到 追加到formdata数据中
+            formdata.append('id', id);
+            formdata.append('content', tinyMCE.activeEditor.getContent());
+            //发送ajax请求,请求得到修改后的数据--通过formdata数据修改
+            $.ajax({
+                type: 'post',
+                url: 'http://localhost:8000/admin/article_edit',
+                contentType: false,
+                processData: false,
+                data: formdata,
+                success: function (data) {
+                    console.log(data);
+                    alert('修改成功!');
+                }
+            })
+        })
+
+    </script>
 </body>
 
 </html>
