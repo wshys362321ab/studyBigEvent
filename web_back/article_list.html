@@ -290,8 +290,8 @@
                 <td class="text-center">{{v.date}}</td>
                 <td class="text-center">{{v.state}}</td>
                 <td class="text-center">
-                    <a href="#" class="btn btn-default btn-xs" data-id =>编辑</a>
-                    <a href="{{v.id}}" class="btn btn-danger btn-xs">删除</a>
+                    <a href="#" class="btn btn-default btn-xs">编辑</a>
+                    <a href="#" data-id = '{{v.id}}' class="btn btn-danger btn-xs btn-delete">删除</a>
                 </td>
             </tr>
         {{/each}}
@@ -356,10 +356,10 @@
                     var res = template('tmp_search', data);
                     $('tbody').html(res);
 
-                    var totalPages = data.totalPage;
+                    var totalPages = data.totalPage;//获取总的页数
+                    window.currentPage = $pagination.twbsPagination('getCurrentPage');
                     if (myTotalPage != totalPages) {
                         myTotalPage = totalPages;
-                        var currentPage = $pagination.twbsPagination('getCurrentPage');
                         $pagination.twbsPagination('destroy');
                         $pagination.twbsPagination($.extend({}, defaultOpts, {
                             startPage: 1,
@@ -377,6 +377,29 @@
 
         //一进入文章列表就 点击一次  筛选按钮
         $('#btnSearch').trigger('click');//原本写死的数据 所有分类 的value值为''空字符串的时候才能获取到所有的内容
+
+        //文章删除--删除按钮是动态生成的,注册点击事件要委托父元素
+        $('tbody').on('click', '.btn-delete', function () {
+            console.log('12345');
+            if (confirm('你确认要删除么?')) {//提醒用户是否确认要删除
+                //发送ajax请求删除文章--用保存的自定义id来知道我们要删除的是哪一个文章
+                var id = $(this).attr('data-id');
+                console.log(id);
+                $.ajax({
+                    url: 'http://localhost:8000/admin/article_delete',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        if (data.code == 200) {
+                            //删除成功后再次渲染一次数据到页面上
+                            getData(window.currentPage);
+                        }
+                    }
+                })
+            }
+        })
     </script>
 
 </body>
